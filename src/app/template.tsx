@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Heading } from "@chakra-ui/react";
 
 export default function RootTemplate({
   children,
@@ -7,8 +7,8 @@ export default function RootTemplate({
 }) {
   return (
     <>
-      <Flex justify="center">
-        <h1>Header</h1>
+      <Flex justify="center" bgColor="gray.50" shadow="sm" minH={14} align="center" w="full">
+        <Heading color="teal.600">Education Portal</Heading>
       </Flex>
       {children}
     </>
