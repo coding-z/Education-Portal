@@ -76,8 +76,8 @@ export default function RootTemplate({
       />
       <Login
         open={loginOpen}
-        handleOpenChange={handleLoginOpenChange}
-        handleCloseLogin={handleCloseLogin}
+        onOpenChange={handleLoginOpenChange}
+        onCloseLogin={handleCloseLogin}
       />
       {children}
       <Toaster />

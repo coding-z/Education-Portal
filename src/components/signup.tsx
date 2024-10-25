@@ -118,8 +118,9 @@ export default function Signup({
       !validateEmail(email) ||
       !validatePassword(password) ||
       !validatePasswordConfirm(passwordConfirm)
-    )
+    ) {
       return;
+    }
 
     const signupPromise = createUserWithEmailAndPassword(auth, email, password);
 
@@ -132,12 +133,12 @@ export default function Signup({
 
     toaster.promise(signupPromise, {
       success: {
-        title: "Sign Up Successful",
+        title: "Signup Success",
         description: "Successfully created account",
         duration: 5000,
       },
       error: {
-        title: "Sign Up Failed",
+        title: "Signup Failure",
         description: "Failed to create account",
         duration: 5000,
       },
