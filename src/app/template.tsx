@@ -72,7 +72,7 @@ export default function RootTemplate({
       <Signup
         open={signupOpen}
         onOpenChange={handleSignupOpenChange}
-        onCloseRegister={handleCloseSignup}
+        onCloseSignup={handleCloseSignup}
       />
       <Login
         open={loginOpen}

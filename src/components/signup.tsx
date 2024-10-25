@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -7,30 +8,34 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
+import {
+  PasswordInput,
+  PasswordStrengthMeter,
+} from "@/components/ui/password-input";
+import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/firebase/config";
 import { DialogOpenChangeDetails, Input, Stack } from "@chakra-ui/react";
 import { validate } from "email-validator";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import { Button } from "./ui/button";
-import { Field } from "./ui/field";
-import { PasswordInput, PasswordStrengthMeter } from "./ui/password-input";
-import { toaster } from "./ui/toaster";
 
 export default function Signup({
   open,
   onOpenChange,
-  onCloseRegister,
+  onCloseSignup,
 }: {
   open: boolean;
   onOpenChange: (details: DialogOpenChangeDetails) => void;
-  onCloseRegister: () => void;
+  onCloseSignup: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [emailInvalid, setEmailInvalid] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordInvalid, setPasswordInvalid] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordConfirmInvalid, setPasswordConfirmInvalid] = useState(false);
   const initialFocusRef = useRef<HTMLInputElement>(null);
 
   function validateEmail(email: string) {
@@ -70,6 +75,12 @@ export default function Signup({
     return strength > 0;
   }
 
+  function validatePasswordConfirm(passwordConfirm: string) {
+    const valid = password === passwordConfirm;
+    setPasswordConfirmInvalid(!valid);
+    return valid;
+  }
+
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
     validateEmail(event.target.value);
@@ -80,12 +91,19 @@ export default function Signup({
     validatePassword(event.target.value);
   }
 
+  function handlePasswordConfirmChange(event: ChangeEvent<HTMLInputElement>) {
+    setPasswordConfirm(event.target.value);
+    validatePasswordConfirm(event.target.value);
+  }
+
   function clearInputs() {
     setEmail("");
     setEmailInvalid(false);
     setPassword("");
     setPasswordInvalid(false);
     setPasswordStrength(0);
+    setPasswordConfirm("");
+    setPasswordConfirmInvalid(false);
   }
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
@@ -96,30 +114,32 @@ export default function Signup({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!validateEmail(email) || !validatePassword(password)) return;
-
-    console.log(email, password);
+    if (
+      !validateEmail(email) ||
+      !validatePassword(password) ||
+      !validatePasswordConfirm(passwordConfirm)
+    )
+      return;
 
     const signupPromise = createUserWithEmailAndPassword(auth, email, password);
 
     signupPromise
       .then((userCredential) => {
-        console.log(userCredential);
-        onCloseRegister();
+        onCloseSignup();
         clearInputs();
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => {});
 
     toaster.promise(signupPromise, {
       success: {
         title: "Sign Up Successful",
         description: "Successfully created account",
+        duration: 5000,
       },
       error: {
         title: "Sign Up Failed",
         description: "Failed to create account",
+        duration: 5000,
       },
       loading: {
         title: "Creating Account...",
@@ -167,6 +187,16 @@ export default function Signup({
                 />
               </Field>
               <PasswordStrengthMeter value={passwordStrength} w="full" />
+              <Field
+                label="Confirm Password"
+                errorText="Passwords don't match"
+                invalid={passwordConfirmInvalid}
+              >
+                <PasswordInput
+                  value={passwordConfirm}
+                  onChange={handlePasswordConfirmChange}
+                />
+              </Field>
             </Stack>
           </DialogBody>
           <DialogFooter>
