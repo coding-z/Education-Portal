@@ -65,7 +65,7 @@ export default function RootTemplate({
             variant="outline"
             onClick={handleOpenLogin}
           >
-            Sign In
+            Log In
           </Button>
         </HStack>
       </Flex>
