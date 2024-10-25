@@ -1,10 +1,15 @@
 "use client";
 
 import Login from "@/components/login";
-import Register from "@/components/register";
+import Signup from "@/components/signup";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
-import { DialogOpenChangeDetails, Flex, Heading, HStack } from "@chakra-ui/react";
+import {
+  DialogOpenChangeDetails,
+  Flex,
+  Heading,
+  HStack,
+} from "@chakra-ui/react";
 import { useState } from "react";
 
 export default function RootTemplate({
@@ -12,19 +17,19 @@ export default function RootTemplate({
 }: {
   children: React.ReactNode;
 }) {
-  const [registerOpen, setRegisterOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
 
-  function handleOpenRegister() {
-    setRegisterOpen(true);
+  function handleOpenSignup() {
+    setSignupOpen(true);
   }
 
-  function handleCloseRegister() {
-    setRegisterOpen(false);
+  function handleCloseSignup() {
+    setSignupOpen(false);
   }
 
-  function handleRegisterOpenChange(details: DialogOpenChangeDetails) {
-    setRegisterOpen(details.open);
+  function handleSignupOpenChange(details: DialogOpenChangeDetails) {
+    setSignupOpen(details.open);
   }
 
   function handleOpenLogin() {
@@ -51,18 +56,23 @@ export default function RootTemplate({
       >
         <Heading color="teal.600">Education Portal</Heading>
         <HStack>
-          <Button colorPalette="teal" onClick={handleOpenRegister}>
+          <Button colorPalette="teal" onClick={handleOpenSignup}>
             Sign Up
           </Button>
-          <Button color="teal.600" borderColor="teal.600" variant="outline" onClick={handleOpenLogin}>
+          <Button
+            color="teal.600"
+            borderColor="teal.600"
+            variant="outline"
+            onClick={handleOpenLogin}
+          >
             Sign In
           </Button>
         </HStack>
       </Flex>
-      <Register
-        open={registerOpen}
-        handleOpenChange={handleRegisterOpenChange}
-        handleCloseRegister={handleCloseRegister}
+      <Signup
+        open={signupOpen}
+        onOpenChange={handleSignupOpenChange}
+        onCloseRegister={handleCloseSignup}
       />
       <Login
         open={loginOpen}
