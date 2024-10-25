@@ -86,7 +86,7 @@ export default function Signup({
     return strength > 0;
   }
 
-  function validatePasswordConfirm(passwordConfirm: string) {
+  function validatePasswordConfirm(password: string, passwordConfirm: string) {
     const valid = password === passwordConfirm;
     setPasswordConfirmErrorText(
       passwordConfirm.length > 0
@@ -108,11 +108,12 @@ export default function Signup({
   function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
     validatePassword(event.target.value);
+    validatePasswordConfirm(event.target.value, passwordConfirm);
   }
 
   function handlePasswordConfirmChange(event: ChangeEvent<HTMLInputElement>) {
     setPasswordConfirm(event.target.value);
-    validatePasswordConfirm(event.target.value);
+    validatePasswordConfirm(password, event.target.value);
   }
 
   // ================================================================================
@@ -141,7 +142,7 @@ export default function Signup({
     if (
       !validateEmail(email) ||
       !validatePassword(password) ||
-      !validatePasswordConfirm(passwordConfirm)
+      !validatePasswordConfirm(password, passwordConfirm)
     ) {
       return;
     }
