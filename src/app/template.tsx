@@ -2,6 +2,7 @@
 
 import Register from "@/components/register";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import { DialogOpenChangeDetails, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -14,6 +15,10 @@ export default function RootTemplate({
 
   function handleOpenRegister() {
     setRegisterOpen(true);
+  }
+
+  function handleCloseRegister() {
+    setRegisterOpen(false);
   }
 
   function handleRegisterOpenChange(details: DialogOpenChangeDetails) {
@@ -38,8 +43,10 @@ export default function RootTemplate({
       <Register
         open={registerOpen}
         handleOpenChange={handleRegisterOpenChange}
+        handleCloseRegister={handleCloseRegister}
       />
       {children}
+      <Toaster />
     </>
   );
 }
