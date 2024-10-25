@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/firebase/config";
-import { DialogOpenChangeDetails, Input, Stack } from "@chakra-ui/react";
+import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
 import { validate } from "email-validator";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
@@ -30,16 +30,24 @@ export default function Signup({
   onCloseSignup: () => void;
 }) {
   const [email, setEmail] = useState("");
-  const [emailInvalid, setEmailInvalid] = useState(false);
   const [password, setPassword] = useState("");
-  const [passwordInvalid, setPasswordInvalid] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [emailInvalid, setEmailInvalid] = useState(false);
+  const [passwordInvalid, setPasswordInvalid] = useState(false);
   const [passwordConfirmInvalid, setPasswordConfirmInvalid] = useState(false);
+  const [emailErrorText, setEmailErrorText] = useState("");
+  const [passwordErrorText, setPasswordErrorText] = useState("");
+  const [passwordConfirmErrorText, setPasswordConfirmErrorText] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const initialFocusRef = useRef<HTMLInputElement>(null);
+
+  // ================================================================================
+  // Client validation
 
   function validateEmail(email: string) {
     const valid = validate(email);
+    setEmailErrorText(email.length > 0 ? "Invalid email" : "Enter an email");
     setEmailInvalid(!valid);
     return valid;
   }
@@ -70,6 +78,9 @@ export default function Signup({
       strength = 4;
     }
 
+    setPasswordErrorText(
+      password.length > 0 ? "Password isn't strong enough" : "Enter a password"
+    );
     setPasswordInvalid(strength === 0);
     setPasswordStrength(strength);
     return strength > 0;
@@ -77,9 +88,17 @@ export default function Signup({
 
   function validatePasswordConfirm(passwordConfirm: string) {
     const valid = password === passwordConfirm;
+    setPasswordConfirmErrorText(
+      passwordConfirm.length > 0
+        ? "Passwords don't match"
+        : "Enter the password again"
+    );
     setPasswordConfirmInvalid(!valid);
     return valid;
   }
+
+  // ================================================================================
+  // Event handling
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -96,23 +115,28 @@ export default function Signup({
     validatePasswordConfirm(event.target.value);
   }
 
-  function clearInputs() {
+  // ================================================================================
+  // Form management
+
+  function clearForm() {
     setEmail("");
-    setEmailInvalid(false);
     setPassword("");
-    setPasswordInvalid(false);
-    setPasswordStrength(0);
     setPasswordConfirm("");
+    setPasswordStrength(0);
+    setErrorVisible(false);
+    setEmailInvalid(false);
+    setPasswordInvalid(false);
     setPasswordConfirmInvalid(false);
   }
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
-    clearInputs();
+    clearForm();
     onOpenChange(details);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setErrorVisible(false);
 
     if (
       !validateEmail(email) ||
@@ -127,9 +151,11 @@ export default function Signup({
     signupPromise
       .then((userCredential) => {
         onCloseSignup();
-        clearInputs();
+        clearForm();
       })
-      .catch((error) => {});
+      .catch((error) => {
+        setErrorVisible(true);
+      });
 
     toaster.promise(signupPromise, {
       success: {
@@ -165,9 +191,14 @@ export default function Signup({
           </DialogHeader>
           <DialogBody>
             <Stack gap={6}>
+              {errorVisible && (
+                <Text color="red.500" fontWeight="medium">
+                  Failed to create account. Perhaps try a different email.
+                </Text>
+              )}
               <Field
                 label="Email"
-                errorText="Invalid email"
+                errorText={emailErrorText}
                 invalid={emailInvalid}
               >
                 <Input
@@ -179,7 +210,7 @@ export default function Signup({
               </Field>
               <Field
                 label="Password"
-                errorText="Password isn't strong enough"
+                errorText={passwordErrorText}
                 invalid={passwordInvalid}
               >
                 <PasswordInput
@@ -190,7 +221,7 @@ export default function Signup({
               <PasswordStrengthMeter value={passwordStrength} w="full" />
               <Field
                 label="Confirm Password"
-                errorText="Passwords don't match"
+                errorText={passwordConfirmErrorText}
                 invalid={passwordConfirmInvalid}
               >
                 <PasswordInput

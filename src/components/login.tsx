@@ -9,15 +9,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
-import {
-  PasswordInput,
-  PasswordStrengthMeter,
-} from "@/components/ui/password-input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/firebase/config";
-import { DialogOpenChangeDetails, Input, Stack } from "@chakra-ui/react";
+import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
 import { validate } from "email-validator";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 
 export default function Login({
@@ -30,26 +27,31 @@ export default function Login({
   onCloseLogin: () => void;
 }) {
   const [email, setEmail] = useState("");
-  const [emailInvalid, setEmailInvalid] = useState(false);
-  const [emailErrorText, setEmailErrorText] = useState("");
   const [password, setPassword] = useState("");
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [emailInvalid, setEmailInvalid] = useState(false);
   const [passwordInvalid, setPasswordInvalid] = useState(false);
-  const [passwordErrorText, setPasswordErrorText] = useState("");
+  const [emailErrorText, setEmailErrorText] = useState("");
   const initialFocusRef = useRef<HTMLInputElement>(null);
+
+  // ================================================================================
+  // Client validation
 
   function validateEmail(email: string) {
     const valid = validate(email);
+    setEmailErrorText(email.length > 0 ? "Invalid email" : "Enter an email");
     setEmailInvalid(!valid);
-    setEmailErrorText("Invalid email");
     return valid;
   }
 
   function validatePassword(password: string) {
     const valid = password.length > 0;
     setPasswordInvalid(!valid);
-    setPasswordErrorText("Enter a password");
     return valid;
   }
+
+  // ================================================================================
+  // Event handling
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -61,20 +63,25 @@ export default function Login({
     validatePassword(event.target.value);
   }
 
-  function clearInputs() {
+  // ================================================================================
+  // Form management
+
+  function clearForm() {
     setEmail("");
-    setEmailInvalid(false);
     setPassword("");
+    setErrorVisible(false);
+    setEmailInvalid(false);
     setPasswordInvalid(false);
   }
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
-    clearInputs();
+    clearForm();
     onOpenChange(details);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setErrorVisible(false);
 
     if (!validateEmail(email) || !validatePassword(password)) return;
 
@@ -83,13 +90,10 @@ export default function Login({
     loginPromise
       .then((userCredential) => {
         onCloseLogin();
-        clearInputs();
+        clearForm();
       })
       .catch((error) => {
-        setEmailInvalid(true);
-        setEmailErrorText("Email may be invalid");
-        setPasswordInvalid(true);
-        setPasswordErrorText("Password may be invalid");
+        setErrorVisible(true);
       });
 
     toaster.promise(loginPromise, {
@@ -126,6 +130,11 @@ export default function Login({
           </DialogHeader>
           <DialogBody>
             <Stack gap={6}>
+              {errorVisible && (
+                <Text color="red.500" fontWeight="medium">
+                  Invalid email and/or password.
+                </Text>
+              )}
               <Field
                 label="Email"
                 errorText={emailErrorText}
@@ -140,7 +149,7 @@ export default function Login({
               </Field>
               <Field
                 label="Password"
-                errorText={passwordErrorText}
+                errorText="Enter a password"
                 invalid={passwordInvalid}
               >
                 <PasswordInput
