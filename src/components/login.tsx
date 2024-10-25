@@ -12,22 +12,21 @@ import { Field } from "./ui/field";
 import { DialogOpenChangeDetails, Input, Stack } from "@chakra-ui/react";
 import { PasswordInput, PasswordStrengthMeter } from "./ui/password-input";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { toaster, Toaster } from "./ui/toaster";
 
-export default function Register({
+export default function Login({
   open,
   handleOpenChange,
-  handleCloseRegister
+  handleCloseLogin
 }: {
   open: boolean;
   handleOpenChange: (details: DialogOpenChangeDetails) => void;
-  handleCloseRegister: () => void;
+  handleCloseLogin: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordStrength, setPasswordStrength] = useState(0);
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -35,21 +34,11 @@ export default function Register({
 
   function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
     setPassword(event.target.value);
-    setPasswordStrength(
-      (() => {
-        if (password.length < 8) return 0;
-        else if (password.length < 10) return 1;
-        else if (password.length < 12) return 2;
-        else if (password.length < 14) return 3;
-        else return 4;
-      })()
-    );
   }
 
   function clearInputs() {
     setEmail("");
     setPassword("");
-    setPasswordStrength(0);
   }
 
   function validatePassword() {}
@@ -58,30 +47,30 @@ export default function Register({
     event.preventDefault();
     console.log(email, password);
 
-    const registerPromise = createUserWithEmailAndPassword(auth, email, password);
+    const signinPromise = signInWithEmailAndPassword(auth, email, password);
     
-    registerPromise
+    signinPromise
       .then((userCredential) => {
         console.log(userCredential);
-        handleCloseRegister();
+        handleCloseLogin();
         clearInputs();
       })
       .catch((error) => {
         console.error(error);
       });
 
-    toaster.promise(registerPromise, {
+    toaster.promise(signinPromise, {
       success: {
-        title: "Registration Success",
-        description: "Successfully created account"
+        title: "Signed In",
+        description: "Successfully signed in"
       },
       error: {
-        title: "Registration Error",
-        description: "Failed to create account"
+        title: "Sign In Error",
+        description: "Failed to sign in"
       },
       loading: {
-        title: "Registering...",
-        description: "Creating account..."
+        title: "Signing In...",
+        description: "Please wait..."
       }
     });
   }
@@ -97,7 +86,7 @@ export default function Register({
         <DialogCloseTrigger />
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create Account</DialogTitle>
+            <DialogTitle>Sign In</DialogTitle>
           </DialogHeader>
           <DialogBody>
             <Stack gap={6}>
@@ -117,13 +106,12 @@ export default function Register({
                   value={password}
                   onChange={handlePasswordChange}
                 />
-                <PasswordStrengthMeter value={passwordStrength} w="full" />
               </Field>
             </Stack>
           </DialogBody>
           <DialogFooter>
             <Button type="submit" colorPalette="teal">
-              Sign Up
+              Sign In
             </Button>
           </DialogFooter>
         </form>
