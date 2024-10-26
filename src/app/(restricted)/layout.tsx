@@ -1,7 +1,19 @@
+"use client";
+
 import Error from "@/components/error";
 import { auth } from "@/firebase/config";
-import React from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import Loading from "../loading";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return auth.currentUser ? <>{children}</> : <Error />;
+  const [contents, setContents] = useState<React.JSX.Element>(<Loading />);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setContents(user ? <>{children}</> : <Error />);
+    });
+  }, []);
+
+  return <>{contents}</>;
 }
