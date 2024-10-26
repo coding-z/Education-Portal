@@ -1,6 +1,6 @@
 import { Center, HStack, Separator, Text } from "@chakra-ui/react";
 
-export default function Page() {
+export default function Error() {
   return (
     <Center flexGrow={1} w="full">
       <HStack gap={4}>
