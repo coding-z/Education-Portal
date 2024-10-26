@@ -18,6 +18,7 @@ import { auth } from "@/firebase/config";
 import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
 import { validate } from "email-validator";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 
 export default function Signup({
@@ -41,6 +42,7 @@ export default function Signup({
   const [passwordConfirmErrorText, setPasswordConfirmErrorText] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const initialFocusRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // ================================================================================
   // Client validation
@@ -153,6 +155,7 @@ export default function Signup({
       .then((userCredential) => {
         onCloseSignup();
         clearForm();
+        router.push("/dashboard");
       })
       .catch((error) => {
         setErrorVisible(true);
