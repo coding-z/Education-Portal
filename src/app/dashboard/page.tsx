@@ -1,5 +1,5 @@
-import { Text } from "@chakra-ui/react";
+import Units from "@/components/units";
 
 export default function Page(): React.JSX.Element {
-  return <Text>Dashboard</Text>;
+  return (<Units />);
 }
