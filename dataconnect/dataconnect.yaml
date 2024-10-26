@@ -1,0 +1,12 @@
+specVersion: "v1beta"
+serviceId: "lms-data-connect"
+location: "australia-southeast2"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "lms-database"
+      cloudSql:
+        instanceId: "lms-cloud-sql"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
