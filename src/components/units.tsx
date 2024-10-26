@@ -25,7 +25,7 @@ const units = [
 
 export default function Units() {
   return (
-    <VStack w={["2xl", null, null, "5xl"]} align="flex-start" mt={14} gap={8}>
+    <VStack w={["2xl", null, null, "5xl"]} align="flex-start" mt={8} gap={8}>
       <Heading size="3xl">Units</Heading>
       <Flex direction="row" justify="flex-start" wrap="wrap" gap={8}>
         {units.map((unit) => (
