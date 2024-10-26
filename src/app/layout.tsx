@@ -1,4 +1,5 @@
 import { Provider } from "@/components/ui/provider";
+import { Toaster } from "@/components/ui/toaster";
 import React from "react";
 import "./global.css";
 
@@ -10,7 +11,10 @@ export default function RootLayout({
   return (
     <html lang="en-GB" dir="ltr" suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <Toaster />
+        </Provider>
       </body>
     </html>
   );
