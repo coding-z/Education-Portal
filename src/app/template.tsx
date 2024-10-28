@@ -2,7 +2,14 @@
 
 import Login from "@/components/login";
 import Signup from "@/components/signup";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/firebase/config";
 import {
@@ -116,15 +123,16 @@ export default function RootTemplate({
           </ChakraLink>
           {user ? (
             <HStack>
-              <Text>{user.email}</Text>
-              <Button
-                color="teal.600"
-                borderColor="teal.600"
-                variant="outline"
-                onClick={handleLogout}
-              >
-                Log Out
-              </Button>
+              <MenuRoot>
+                <MenuTrigger>
+                  <Avatar name={user.email} _hover={{ cursor: "pointer" }} />
+                </MenuTrigger>
+                <MenuContent>
+                  <MenuItem value="logout" onClick={handleLogout}>
+                    Log Out
+                  </MenuItem>
+                </MenuContent>
+              </MenuRoot>
             </HStack>
           ) : (
             <HStack>
