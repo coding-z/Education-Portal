@@ -112,9 +112,11 @@ export default function RootTemplate({
         zIndex="docked"
       >
         <Flex
-          w={["2xl", null, null, "5xl"]}
+          flexGrow={1}
           justify="space-between"
           align="center"
+          px={14}
+          py={2}
         >
           <ChakraLink asChild colorPalette="teal" p={2}>
             <Link href="/">
