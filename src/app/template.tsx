@@ -130,7 +130,14 @@ export default function RootTemplate({
                   <Avatar name={user.email} _hover={{ cursor: "pointer" }} />
                 </MenuTrigger>
                 <MenuContent>
-                  <MenuItem value="logout" onClick={handleLogout}>
+                  <MenuItem value={user.email} closeOnSelect={false}>
+                    {user.email}
+                  </MenuItem>
+                  <MenuItem
+                    value="logout"
+                    onClick={handleLogout}
+                    _hover={{ cursor: "pointer" }}
+                  >
                     Log Out
                   </MenuItem>
                 </MenuContent>
