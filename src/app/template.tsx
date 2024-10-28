@@ -102,6 +102,7 @@ export default function RootTemplate({
         minH={16}
         align="center"
         w="full"
+        zIndex="docked"
       >
         <Flex
           w={["2xl", null, null, "5xl"]}
