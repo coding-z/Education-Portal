@@ -9,8 +9,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { IconButton } from "@chakra-ui/react";
+import { IconButton, Link as ChakraLink, VStack } from "@chakra-ui/react";
+import Link from "next/link";
 import { LuAlignJustify } from "react-icons/lu";
+import { Button } from "./ui/button";
 
 /**
  * The menu of features and options available in the dashboard once signed in.
@@ -30,7 +32,14 @@ export default function Menu() {
           <DrawerTitle>Menu</DrawerTitle>
         </DrawerHeader>
         <DrawerBody>
-          <p>Hello there</p>
+          <VStack>
+            <Button w="full" variant="ghost">
+              <Link href="/dashboard/units">Units</Link>
+            </Button>
+            <Button w="full" variant="ghost">
+              <Link href="/dashboard/codes">Codes</Link>
+            </Button>
+          </VStack>
         </DrawerBody>
         <DrawerFooter></DrawerFooter>
       </DrawerContent>

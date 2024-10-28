@@ -56,7 +56,7 @@ export default function RootTemplate({
 
   function handleLoginSuccess() {
     setLoginOpen(false);
-    router.push("/dashboard");
+    router.push("/dashboard/units");
     console.log("routing");
   }
 

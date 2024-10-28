@@ -179,7 +179,7 @@ export default function Signup({
           .then(() => {
             onCloseSignup();
             clearForm();
-            router.push("/dashboard");
+            router.push("/dashboard/units");
           });
       })
       .catch((error) => {

@@ -1,14 +1,13 @@
 "use client";
 
 import Menu from "@/components/menu";
-import Units from "@/components/units";
 import { auth } from "@/firebase/config";
 import { Flex, HStack, VStack } from "@chakra-ui/react";
 import { onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import supabase from "../../../../supabase/config";
 
-export default function Page(): React.JSX.Element {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const [isTeacher, setIsTeacher] = useState<boolean>(false);
 
   useEffect(() => {
@@ -32,7 +31,7 @@ export default function Page(): React.JSX.Element {
       </Flex>
       <VStack w="full">
         <h1>{isTeacher ? "Teacher" : "Student"}</h1>
-        <Units />
+        {children}
       </VStack>
     </HStack>
   );

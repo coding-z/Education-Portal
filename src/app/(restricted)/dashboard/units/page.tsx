@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, Flex, Heading, VStack } from "@chakra-ui/react";
-import supabase from "../../supabase/config";
 import { useState } from "react";
+import supabase from "../../../../../supabase/config";
 
-export default function Units() {
+export default function Page() {
   const [units, setUnits] = useState([]);
   
   supabase
