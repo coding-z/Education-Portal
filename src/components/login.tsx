@@ -16,6 +16,7 @@ import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
 import { validate } from "email-validator";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import supabase from "../../supabase/config";
 
 export default function Login({
   open,
@@ -85,7 +86,8 @@ export default function Login({
 
     if (!validateEmail(email) || !validatePassword(password)) return;
 
-    const loginPromise = signInWithEmailAndPassword(auth, email, password);
+    // const loginPromise = signInWithEmailAndPassword(auth, email, password);
+    const loginPromise = supabase.auth.signInWithPassword({ email, password });
 
     loginPromise
       .then((userCredential) => {

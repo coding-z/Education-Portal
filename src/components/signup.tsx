@@ -165,7 +165,8 @@ export default function Signup({
       return;
     }
 
-    const signupPromise = createUserWithEmailAndPassword(auth, email, password);
+    // const signupPromise = createUserWithEmailAndPassword(auth, email, password);
+    const signupPromise = supabase.auth.signUp({ email, password });
 
     signupPromise
       .then((userCredential) => {
