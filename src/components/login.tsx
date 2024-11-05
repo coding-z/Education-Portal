@@ -20,11 +20,11 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react";
 export default function Login({
   open,
   onOpenChange,
-  onCloseLogin,
+  onLoginSuccess,
 }: {
   open: boolean;
   onOpenChange: (details: DialogOpenChangeDetails) => void;
-  onCloseLogin: () => void;
+  onLoginSuccess: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -89,7 +89,7 @@ export default function Login({
 
     loginPromise
       .then((userCredential) => {
-        onCloseLogin();
+        onLoginSuccess();
         clearForm();
       })
       .catch((error) => {

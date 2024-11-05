@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DialogBody,
@@ -13,12 +15,21 @@ import {
   PasswordInput,
   PasswordStrengthMeter,
 } from "@/components/ui/password-input";
+import { Switch } from "@/components/ui/switch";
 import { toaster } from "@/components/ui/toaster";
 import { auth } from "@/firebase/config";
-import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
+import {
+  DialogOpenChangeDetails,
+  Input,
+  Stack,
+  SwitchCheckedChangeDetails,
+  Text,
+} from "@chakra-ui/react";
 import { validate } from "email-validator";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import supabase from "../../supabase/config";
 
 export default function Signup({
   open,
@@ -40,7 +51,9 @@ export default function Signup({
   const [passwordErrorText, setPasswordErrorText] = useState("");
   const [passwordConfirmErrorText, setPasswordConfirmErrorText] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [asTeacher, setAsTeacher] = useState<boolean>(false);
   const initialFocusRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // ================================================================================
   // Client validation
@@ -116,6 +129,10 @@ export default function Signup({
     validatePasswordConfirm(password, event.target.value);
   }
 
+  function handleAccountTypeChange(details: SwitchCheckedChangeDetails) {
+    setAsTeacher(details.checked);
+  }
+
   // ================================================================================
   // Form management
 
@@ -128,6 +145,7 @@ export default function Signup({
     setEmailInvalid(false);
     setPasswordInvalid(false);
     setPasswordConfirmInvalid(false);
+    setAsTeacher(false);
   }
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
@@ -151,8 +169,18 @@ export default function Signup({
 
     signupPromise
       .then((userCredential) => {
-        onCloseSignup();
-        clearForm();
+        supabase
+          .from("users")
+          .insert({
+            email: email,
+            username: email,
+            privilege: asTeacher ? "teacher" : "student",
+          })
+          .then(() => {
+            onCloseSignup();
+            clearForm();
+            router.push("/dashboard/units");
+          });
       })
       .catch((error) => {
         setErrorVisible(true);
@@ -230,6 +258,12 @@ export default function Signup({
                   onChange={handlePasswordConfirmChange}
                 />
               </Field>
+              <Switch
+                checked={asTeacher}
+                onCheckedChange={handleAccountTypeChange}
+              >
+                Create Teacher Account
+              </Switch>
             </Stack>
           </DialogBody>
           <DialogFooter>
