@@ -2,17 +2,17 @@
 
 import { Card, Flex, Heading, VStack } from "@chakra-ui/react";
 import { useState } from "react";
-import supabase from "../../../../../supabase/config";
+import supabase from "../../../../../../supabase/config";
 
 export default function Page() {
   const [units, setUnits] = useState([]);
-  
-  supabase
-    .from("unit")
-    .select()
-    .then((value) => {
-      setUnits(value.data);
-    });
+
+  // supabase
+  //   .from("unit")
+  //   .select()
+  //   .then((value) => {
+  //     setUnits(value.data);
+  //   });
 
   return (
     <VStack w={["2xl", null, null, "5xl"]} align="flex-start" mt={8} gap={8}>
