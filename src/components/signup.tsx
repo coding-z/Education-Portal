@@ -168,18 +168,18 @@ export default function Signup({
 
     signupPromise
       .then((userCredential) => {
-        supabase
-          .from("users")
-          .insert({
-            email: email,
-            username: email,
-            privilege: asTeacher ? "teacher" : "student",
-          })
-          .then(() => {
+        // supabase
+        //   .from("users")
+        //   .insert({
+        //     email: email,
+        //     username: email,
+        //     privilege: asTeacher ? "teacher" : "student",
+        //   })
+          // .then(() => {
             onCloseSignup();
             clearForm();
             router.push("/dashboard/units");
-          });
+          // });
       })
       .catch((error) => {
         setErrorVisible(true);
