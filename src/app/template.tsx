@@ -11,7 +11,6 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { toaster } from "@/components/ui/toaster";
-import { auth } from "@/firebase/config";
 import {
   Link as ChakraLink,
   DialogOpenChangeDetails,
@@ -20,10 +19,11 @@ import {
   HStack,
   Text,
 } from "@chakra-ui/react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import supabase from "../../supabase/config";
 
 export default function RootTemplate({
   children,
@@ -65,7 +65,7 @@ export default function RootTemplate({
   }
 
   function handleLogout() {
-    const signoutPromise = auth.signOut();
+    const signoutPromise = supabase.auth.signOut();
 
     signoutPromise.then(() => router.push("/"));
 
@@ -91,9 +91,9 @@ export default function RootTemplate({
   // Checking for logged in user
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUser(session.user);
       } else {
         setUser(null);
       }

@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/password-input";
 import { Switch } from "@/components/ui/switch";
 import { toaster } from "@/components/ui/toaster";
-import { auth } from "@/firebase/config";
 import {
   DialogOpenChangeDetails,
   Input,
@@ -26,7 +25,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { validate } from "email-validator";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import supabase from "../../supabase/config";
