@@ -17,9 +17,11 @@ import {
   DialogOpenChangeDetails,
   Input,
   PinInputValueChangeDetails,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { validate } from "email-validator";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import supabase from "../../supabase/config";
 
@@ -34,6 +36,7 @@ export default function Login() {
   const [otpError, setOtpError] = useState<string | null>(null);
   const submitRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
     setOpen(details.open);
@@ -102,9 +105,10 @@ export default function Login() {
         setOpen(false);
         clear();
         toaster.success({
-          title: "Logged In Successfully",
+          title: "Logged In",
           duration: 5000,
         });
+        router.push("/dashboard/units");
       }
     }
 
@@ -115,9 +119,10 @@ export default function Login() {
     setOtp(details.value);
   }
 
-  function handleAutoSubmit() {
-    // Auto submit once the entire code is typed
-    formRef.current.requestSubmit(submitRef.current);
+  function handlePinComplete() {
+    // Focus the submit button for convenience
+    // Potentially auto submit the form using formRef
+    submitRef.current.focus();
   }
 
   return (
@@ -128,14 +133,22 @@ export default function Login() {
       initialFocusEl={getEmailRef}
     >
       <DialogBackdrop />
-      <DialogTrigger asChild colorPalette="teal">
-        <Button variant="ghost">Log In</Button>
+      <DialogTrigger asChild>
+        <Button variant="ghost" color="teal.600">
+          Log In
+        </Button>
       </DialogTrigger>
       <DialogContent colorPalette="teal">
         <DialogCloseTrigger />
         <form onSubmit={handleSubmit} ref={formRef}>
           <DialogHeader>
-            <DialogTitle>Log In</DialogTitle>
+            <VStack gap={2} align="flex-start">
+              <DialogTitle>Log In</DialogTitle>
+              <Text>
+                An account will be created for you if you don't already have
+                one.
+              </Text>
+            </VStack>
           </DialogHeader>
           <DialogBody>
             <VStack gap={8}>
@@ -160,7 +173,7 @@ export default function Login() {
                   errorText={otpError}
                 >
                   <PinInput
-                    onValueComplete={handleAutoSubmit}
+                    onValueComplete={handlePinComplete}
                     autoFocus
                     count={6}
                     otp

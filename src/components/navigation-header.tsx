@@ -1,54 +1,47 @@
-import { Flex, Heading, HStack } from "@chakra-ui/react";
-import { Link as ChakraLink } from "@chakra-ui/react";
-import NextLink from "next/link";
-import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "@/components/ui/menu";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import NavigationDrawer from "@/components/navigation-drawer";
-import { useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
-import supabase from "../../supabase/config";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
 import { toaster } from "@/components/ui/toaster";
-import { useRouter } from "next/navigation";
+import { Link as ChakraLink, Flex, Heading, HStack } from "@chakra-ui/react";
+import { User } from "@supabase/supabase-js";
 import Image from "next/image";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import supabase from "../../supabase/config";
 import logo from "../app/icon.svg";
 import Login from "./login";
 
-export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpenSignup: () => void; onOpenLogin: () => void; }) {
+export default function NavigationHeader() {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   function handleLogout() {
-    const signoutPromise = supabase.auth.signOut();
-
-    signoutPromise.then(() => router.push("/"));
-
-    toaster.promise(signoutPromise, {
-      success: {
-        title: "Signed Out",
-        description: "Successfully signed out",
-        duration: 5000,
-      },
-      error: {
-        title: "Signout Error",
-        description: "Failed to sign out",
-        duration: 5000,
-      },
-      loading: {
-        title: "Signing Out...",
-        description: "Please wait",
-      },
+    supabase.auth.signOut()
+    .then(({ error }) => {
+      if (!error) {
+        router.push("/");
+        toaster.success({
+          title: "Signed Out",
+          duration: 5000
+        });
+      } else {
+        toaster.error({
+          title: "Failed to Sign Out",
+          duration: 5000
+        });
+      }
     });
   }
 
   useEffect(() => {
-    supabase.auth.getUser()
-    .then(({ data: { user }, error }) => {
-      if (error) {
-        setUser(null);
-      } else {
-        setUser(user);
-      }
+    supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session !== null ? session.user : null);
     });
   }, []);
 
@@ -71,11 +64,13 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
       >
         <ChakraLink asChild colorPalette="teal" p={2}>
           <NextLink href="/">
-            <Image src={logo} alt="Education portal logo" />
-            <Heading color="teal.600">Education Portal</Heading>
+            <HStack gap={4}>
+              <Image src={logo} alt="Education portal logo" />
+              <Heading color="teal.600">Education Portal</Heading>
+            </HStack>
           </NextLink>
         </ChakraLink>
-        {user ? (
+        {user !== null ? (
           <HStack>
             <MenuRoot>
               <MenuTrigger>
@@ -98,21 +93,10 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
         ) : (
           <>
             <HStack hideBelow="md">
-              <Button colorPalette="teal" onClick={onOpenSignup}>
-                Sign Up
-              </Button>
-              {/* <Button
-                color="teal.600"
-                borderColor="teal.600"
-                variant="ghost"
-                onClick={onOpenLogin}
-              >
-                Log In
-              </Button> */}
               <Login />
             </HStack>
             <HStack hideFrom="md">
-              <NavigationDrawer onOpenSignup={onOpenSignup} onOpenLogin={onOpenLogin} />
+              <NavigationDrawer />
             </HStack>
           </>
         )}
