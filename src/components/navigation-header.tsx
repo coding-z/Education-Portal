@@ -12,6 +12,7 @@ import { toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "../app/icon.svg";
+import Login from "./login";
 
 export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpenSignup: () => void; onOpenLogin: () => void; }) {
   const [user, setUser] = useState<User | null>(null);
@@ -100,14 +101,15 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
               <Button colorPalette="teal" onClick={onOpenSignup}>
                 Sign Up
               </Button>
-              <Button
+              {/* <Button
                 color="teal.600"
                 borderColor="teal.600"
                 variant="ghost"
                 onClick={onOpenLogin}
               >
                 Log In
-              </Button>
+              </Button> */}
+              <Login />
             </HStack>
             <HStack hideFrom="md">
               <NavigationDrawer onOpenSignup={onOpenSignup} onOpenLogin={onOpenLogin} />

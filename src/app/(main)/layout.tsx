@@ -79,11 +79,11 @@ export default function RootTemplate({
         onOpenChange={handleSignupOpenChange}
         onCloseSignup={handleCloseSignup}
       />
-      <Login
+      {/* <Login
         open={loginOpen}
         onOpenChange={handleLoginOpenChange}
         onLoginSuccess={handleLoginSuccess}
-      />
+      /> */}
     </Flex>
   );
 }
