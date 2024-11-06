@@ -44,7 +44,7 @@ export default function NavigationDrawer({ onOpenSignup, onOpenLogin }: { onOpen
             <Button
               color="teal.600"
               borderColor="teal.600"
-              variant="outline"
+              variant="ghost"
               onClick={handleOpenLogin}
             >
               Log In

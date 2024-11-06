@@ -10,6 +10,8 @@ import { User } from "@supabase/supabase-js";
 import supabase from "../../supabase/config";
 import { toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import logo from "../app/icon.svg";
 
 export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpenSignup: () => void; onOpenLogin: () => void; }) {
   const [user, setUser] = useState<User | null>(null);
@@ -53,7 +55,7 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
     <Flex
       justify="center"
       bgColor="gray.50"
-      shadow="sm"
+      shadow="md"
       minH={16}
       align="center"
       w="full"
@@ -68,6 +70,7 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
       >
         <ChakraLink asChild colorPalette="teal" p={2}>
           <NextLink href="/">
+            <Image src={logo} alt="Education portal logo" />
             <Heading color="teal.600">Education Portal</Heading>
           </NextLink>
         </ChakraLink>
@@ -100,7 +103,7 @@ export default function NavigationHeader({ onOpenSignup, onOpenLogin }: { onOpen
               <Button
                 color="teal.600"
                 borderColor="teal.600"
-                variant="outline"
+                variant="ghost"
                 onClick={onOpenLogin}
               >
                 Log In
