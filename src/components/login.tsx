@@ -11,10 +11,8 @@ import {
 import { Field } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { toaster } from "@/components/ui/toaster";
-import { auth } from "@/firebase/config";
 import { DialogOpenChangeDetails, Input, Stack, Text } from "@chakra-ui/react";
 import { validate } from "email-validator";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import supabase from "../../supabase/config";
 

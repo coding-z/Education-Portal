@@ -1,9 +1,7 @@
 "use client";
 
 import Menu from "@/components/menu";
-import { auth } from "@/firebase/config";
 import { Flex, HStack, VStack } from "@chakra-ui/react";
-import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import supabase from "../../../../supabase/config";
 
@@ -11,12 +9,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isTeacher, setIsTeacher] = useState<boolean>(false);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
         supabase
           .from("users")
           .select("privilege")
-          .eq("email", user.email)
+          .eq("email", session.user.email)
           .then((value) => {
             setIsTeacher(value.data[0].privilege === "teacher");
           });
