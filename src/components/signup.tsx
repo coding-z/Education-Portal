@@ -164,10 +164,11 @@ export default function Signup({
     }
 
     // const signupPromise = createUserWithEmailAndPassword(auth, email, password);
-    const signupPromise = supabase.auth.signUp({ email, password });
+    // const signupPromise = supabase.auth.signUp({ email, password });
+    const signupPromise = supabase.auth.signInWithOtp({ email });
 
     signupPromise
-      .then((userCredential) => {
+      .then((response) => {
         // supabase
         //   .from("users")
         //   .insert({
@@ -180,9 +181,11 @@ export default function Signup({
             clearForm();
             router.push("/dashboard/units");
           // });
+          console.log(response);
       })
       .catch((error) => {
         setErrorVisible(true);
+        console.error(error);
       });
 
     toaster.promise(signupPromise, {
