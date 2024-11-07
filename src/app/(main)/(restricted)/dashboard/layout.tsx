@@ -1,9 +1,10 @@
 "use client";
 
 import Menu from "@/components/menu";
-import { Flex, HStack, VStack } from "@chakra-ui/react";
+import { Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import supabase from "../../../../supabase/config";
+import DashboardHeader from "@/components/dashboard-header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isTeacher, setIsTeacher] = useState<boolean>(false);
@@ -12,25 +13,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         supabase
-          .from("users")
-          .select("privilege")
-          .eq("email", session.user.email)
+          .from("USER")
+          .select("PRIVILEGE")
+          .eq("EMAIL", session.user.email)
           .then((value) => {
-            setIsTeacher(value.data[0].privilege === "teacher");
+            setIsTeacher(value.data[0].PRIVILEGE === "teacher");
           });
       }
     });
   }, []);
 
   return (
-    <HStack w="full" gap={0} flexGrow={1} align="stretch">
-      <Flex direction="column" p={2} bgColor="gray.50" shadow="sm">
-        <Menu />
-      </Flex>
-      <VStack w="full">
-        <h1>{isTeacher ? "Teacher" : "Student"}</h1>
-        {children}
-      </VStack>
-    </HStack>
+    <Flex direction="column" justify="flex-start" align="center" flexGrow={1} w="full">
+      <DashboardHeader />
+      {children}
+    </Flex>
   );
 }

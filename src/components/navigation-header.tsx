@@ -13,8 +13,8 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import supabase from "../supabase/config";
 import logo from "../app/icon.svg";
+import supabase from "../supabase/config";
 import Login from "./login";
 
 export default function NavigationHeader() {
@@ -22,21 +22,20 @@ export default function NavigationHeader() {
   const router = useRouter();
 
   function handleLogout() {
-    supabase.auth.signOut()
-      .then(({ error }) => {
-        if (!error) {
-          router.push("/");
-          toaster.success({
-            title: "Signed Out",
-            duration: 5000
-          });
-        } else {
-          toaster.error({
-            title: "Failed to Sign Out",
-            duration: 5000
-          });
-        }
-      });
+    supabase.auth.signOut().then(({ error }) => {
+      if (!error) {
+        router.push("/");
+        toaster.success({
+          title: "Signed Out",
+          duration: 5000,
+        });
+      } else {
+        toaster.error({
+          title: "Failed to Sign Out",
+          duration: 5000,
+        });
+      }
+    });
   }
 
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function NavigationHeader() {
         px={{ base: 2, md: 8, lg: 14 }}
         py={2}
       >
-        <ChakraLink asChild colorPalette="teal" p={2}>
+        <ChakraLink asChild colorPalette="teal" px={4} py={2}>
           <NextLink href="/">
             <HStack gap={4}>
               <Image src={logo} alt="Education portal logo" />

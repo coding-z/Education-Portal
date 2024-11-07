@@ -101,14 +101,22 @@ export default function Login() {
       if (error !== null) {
         setOtpError("Invalid passcode. Double-check or retry after a minute.");
       } else {
-        console.log(data);
-        setOpen(false);
-        clear();
-        toaster.success({
-          title: "Logged In",
-          duration: 5000,
-        });
-        router.push("/dashboard/units");
+        const { error } = await supabase
+          .from("USER")
+          .insert({ EMAIL: email, USERNAME: email, PRIVILEGE: "teacher" });
+
+        if (error) {
+          console.error(error);
+        } else {
+          console.log(data);
+          setOpen(false);
+          clear();
+          toaster.success({
+            title: "Logged In",
+            duration: 5000,
+          });
+          router.push("/dashboard/units");
+        }
       }
     }
 
