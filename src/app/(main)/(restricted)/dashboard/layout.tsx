@@ -3,7 +3,7 @@
 import Menu from "@/components/menu";
 import { Flex, HStack, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import supabase from "../../../../../supabase/config";
+import supabase from "../../../../supabase/config";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isTeacher, setIsTeacher] = useState<boolean>(false);

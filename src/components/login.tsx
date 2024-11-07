@@ -23,7 +23,7 @@ import {
 import { validate } from "email-validator";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import supabase from "../../supabase/config";
+import supabase from "../supabase/config";
 
 export default function Login() {
   const [open, setOpen] = useState(false);

@@ -13,7 +13,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import supabase from "../../supabase/config";
+import supabase from "../supabase/config";
 import logo from "../app/icon.svg";
 import Login from "./login";
 
@@ -23,20 +23,20 @@ export default function NavigationHeader() {
 
   function handleLogout() {
     supabase.auth.signOut()
-    .then(({ error }) => {
-      if (!error) {
-        router.push("/");
-        toaster.success({
-          title: "Signed Out",
-          duration: 5000
-        });
-      } else {
-        toaster.error({
-          title: "Failed to Sign Out",
-          duration: 5000
-        });
-      }
-    });
+      .then(({ error }) => {
+        if (!error) {
+          router.push("/");
+          toaster.success({
+            title: "Signed Out",
+            duration: 5000
+          });
+        } else {
+          toaster.error({
+            title: "Failed to Sign Out",
+            duration: 5000
+          });
+        }
+      });
   }
 
   useEffect(() => {
