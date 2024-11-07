@@ -103,7 +103,7 @@ export default function Login() {
       } else {
         const { error } = await supabase
           .from("USER")
-          .insert({ EMAIL: email, USERNAME: email, PRIVILEGE: "teacher" });
+          .insert({ ID: data.user.id, EMAIL: email, USERNAME: email.split("@")[0], PRIVILEGE: "teacher" });
 
         if (error) {
           console.error(error);

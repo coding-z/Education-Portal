@@ -16,14 +16,16 @@ import { useEffect, useState } from "react";
 import logo from "../app/icon.svg";
 import supabase from "../supabase/config";
 import Login from "./login";
+import { Tables } from "@/supabase/supabase";
 
 export default function NavigationHeader() {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<Tables<"USER"> | null>(null);
   const router = useRouter();
 
   function handleLogout() {
     supabase.auth.signOut().then(({ error }) => {
-      if (!error) {
+      if (error === null) {
         router.push("/");
         toaster.success({
           title: "Signed Out",
@@ -41,6 +43,17 @@ export default function NavigationHeader() {
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
       setUser(session !== null ? session.user : null);
+
+      if (session !== null) {
+        supabase.from("USER").select().eq("ID", session.user.id)
+        .then(({ data, error }) => {
+          if (error !== null) {
+            console.error(error);
+          } else {
+            setUserData(data[0]);
+          }
+        });
+      }
     });
   }, []);
 
@@ -69,11 +82,11 @@ export default function NavigationHeader() {
             </HStack>
           </NextLink>
         </ChakraLink>
-        {user !== null ? (
+        {user && userData ? (
           <HStack>
             <MenuRoot>
               <MenuTrigger>
-                <Avatar name={user.email} _hover={{ cursor: "pointer" }} />
+                <Avatar name={userData.USERNAME} _hover={{ cursor: "pointer" }} />
               </MenuTrigger>
               <MenuContent>
                 <MenuItem value={user.email} closeOnSelect={false}>

@@ -45,6 +45,7 @@ export default function Codes() {
           });
         } else {
           fetchCodes();
+          handleClearCode();
           toaster.success({
             title: "Created Code",
             duration: 5000,
