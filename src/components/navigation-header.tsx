@@ -60,7 +60,7 @@ export default function NavigationHeader() {
   return (
     <Flex
       justify="center"
-      bgColor="gray.50"
+      bgColor={{ base: "gray.50", _dark: "gray.800" }}
       shadow="md"
       minH={16}
       align="center"
