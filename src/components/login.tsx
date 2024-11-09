@@ -11,300 +11,144 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
-import { PinInput } from "@/components/ui/pin-input";
-import { toaster } from "@/components/ui/toaster";
 import {
-  createListCollection,
-  DialogOpenChangeDetails,
-  Input,
-  PinInputValueChangeDetails,
-  SelectValueChangeDetails,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+  PasswordInput,
+  PasswordStrengthMeter,
+} from "@/components/ui/password-input";
+import supabase from "@/supabase/config";
+import { DialogOpenChangeDetails, Input, VStack } from "@chakra-ui/react";
 import { validate } from "email-validator";
-import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import supabase from "../supabase/config";
-import {
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-} from "@/components/ui/select";
-
-const accountTypes = createListCollection({
-  items: [
-    { label: "Student", value: "student" },
-    { label: "Teacher", value: "teacher" },
-  ],
-});
+import { ChangeEvent, useRef, useState } from "react";
 
 export default function Login() {
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("Log In");
   const emailRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpError, setOtpError] = useState<string | null>(null);
-  const submitRef = useRef<HTMLButtonElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const router = useRouter();
-  const [account, setAccount] = useState<string[]>(["student"]);
-  const [referralCodeError, setTeacherPinError] = useState<string | null>(null);
-  const [teacherPin, setTeacherPin] = useState(["", "", "", "", "", ""]);
-  const [validTeacherPin, setValidTeacherPin] = useState(false);
-  const [signup, setSignup] = useState(false);
-  const otpRef = useRef<HTMLInputElement>(null);
-
-  function handleAccountChange(details: SelectValueChangeDetails) {
-    setAccount(details.value);
-    console.log(details.value);
-  }
+  const [emailHelp, setEmailHelp] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [password, setPassword] = useState("");
+  const [passwordPlaceholder, setPasswordPlaceholder] = useState(
+    "Enter your password"
+  );
+  const [passwordError, setPasswordError] = useState("");
+  const [showStrength, setShowStrength] = useState(false);
+  const [strength, setStrength] = useState(0);
+  const passwordConfirmRef = useRef<HTMLInputElement>(null);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordConfirmError, setPasswordConfirmError] = useState("");
 
   function handleOpenChange(details: DialogOpenChangeDetails) {
     setOpen(details.open);
 
     if (!details.open) {
-      clear();
+      setTitle("Log In");
+      setEmail("");
+      setEmailHelp("");
+      setEmailError("");
+      setPassword("");
+      setPasswordPlaceholder("Enter your password");
+      setPasswordError("");
+      setShowStrength(false);
+      setStrength(0);
+      setShowPasswordConfirm(false);
+      setPasswordConfirm("");
+      setPasswordConfirmError("");
     }
   }
 
-  function getEmailRef() {
-    return emailRef.current;
+  function showSignup(show: boolean) {
+    setTitle(show ? "Sign Up" : "Log In");
+    setEmailHelp(show ? "Looks like you don't have an account. Sign up?" : "");
+    setPasswordPlaceholder(show ? "Create a password" : "Enter your password");
+    setShowStrength(show);
+    setShowPasswordConfirm(show);
   }
-
-  
-
-  
-  // DIALOG HANDLING, REFS, UTILITIES & OTHER
-  
-  function clear() {
-    setEmail("");
-    setEmailError(null);
-    setOtp(["", "", "", "", "", ""]);
-    setOtpSent(false);
-    setOtpError(null);
-  }
-  
-  // CLIENT-SIDE VALIDATION
-
-  function validateEmail() {
-    const valid = validate(email);
-
-    if (valid) {
-      setEmailError(null);
-    } else {
-      setEmailError(email.length > 0 ? "Invalid email" : "Enter an email");
-    }
-
-    return valid;
-  }
-  
-  // CONTROLLED-INPUT HANDLING
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
-    setEmailError(null);
+    if (emailError) setEmailError("");
   }
 
-  function handleOtpChange(details: PinInputValueChangeDetails) {
-    setOtp(details.value);
-    setOtpError(null);
-  }
+  async function handleEmailComplete(event: ChangeEvent<HTMLInputElement>) {
+    // Client validation
+    const valid = validate(email);
 
-  async function handleOtpComplete() {
-    const response = await supabase.auth.verifyOtp({
-      email,
-      token: otp.join(""),
-      type: "email"
-    });
+    setEmailError(
+      valid ? "" : email.length ? "Invalid email" : "Enter an email"
+    );
 
-    console.log(response);
-
-    if (response.error !== null) {
-      setOtpError("Invalid passcode. Double-check or retry after a minute.");
-      otpRef.current.blur();
-      otpRef.current.focus();
-    } else {
-      setOpen(false);
-      clear();
-      toaster.success({
-        title: "Logged In",
-        duration: 5000,
-      });
-      router.push("/dashboard/units");
-    }
-  }
-
-  // LOGIN SUBMISSION
-
-  /**
-   * Handles submitting the email for further information
-   */
-  function handleSubmitEmailCheck() {
-
-  }
-
-  /**
-   * Handles submitting a request for the OTP to be emailed
-   */
-  async function handleSubmitOtpRequest() {
-    const { error } = await supabase.auth.signInWithOtp({ email });
-
-    if (error !== null) {
-      setEmailError("Something went wrong. Try a different email?");
-    } else {
-      setOtpSent(true);
-    }
-  }
-
-  /**
-   * Handles submitting the OTP for verification
-   */
-  function handleSubmitOtpVerify() {
-
-  }
-
-  /**
-   * Handles submitting the referral code for verification
-   */
-  function handleSubmitReferralVerify() {
-
-  }
-
-  /**
-   * Handles submitting the login details by the main submission button
-   */
-  // function handleSubmit() {
-
-  // }
-
-
-
-
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-
-    // Client-verification of email
-    if (!validateEmail()) {
-      setLoading(false);
+    if (!valid) {
+      emailRef.current.focus();
       return;
     }
 
-    // Check for existing account with given email
-    const { data, error } = await supabase.from("USER").select().eq("EMAIL", email);
+    // Server validation? (e.g. email account exists)
 
-    if (error !== null || data.length !== 1) {
-      // Signup path
-      setSignup(true);
-    } else {
-      // Login path
-      const { data, error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-      
-      if (error !== null) {
-        setEmailError("Something went wrong. Try a different email?");
-      } else {
-        setOtpSent(true);
-      }
-    }
-
-    // if (!otpSent) {
-    //   const emailValid = validateEmail();
-
-    //   if (emailValid) {
-    //     handleSubmitOtpRequest();
-    //     // if (account[0] === "teacher" && validTeacherPin) {
-    //     //   handleSubmitOtpRequest();
-    //     // } else {
-    //     //   setTeacherPinError("Enter the teacher code");
-    //     // }
-    //   }
-    // } else {
-    //   const { data, error } = await supabase.auth.verifyOtp({
-    //     email,
-    //     token: otp.join(""),
-    //     type: "email",
-    //   });
-
-    //   if (error !== null) {
-    //     setOtpError("Invalid passcode. Double-check or retry after a minute.");
-    //   } else {
-    //     supabase.from("USER").select().eq("ID", data.user.id)
-    //     .then(async ({data, error}) => {
-    //       if (data.length === 0 && error === null) {
-    //         const { error } = await supabase.from("USER").insert({
-    //           ID: data.user.id,
-    //           EMAIL: email,
-    //           USERNAME: email.split("@")[0],
-    //           PRIVILEGE: "teacher",
-    //         });
-    //       }
-    //     })
-
-    //     if (error) {
-    //       console.error(error);
-    //     } else {
-    //       console.log(data);
-    //       setOpen(false);
-    //       clear();
-    //       toaster.success({
-    //         title: "Logged In",
-    //         duration: 5000,
-    //       });
-    //       router.push("/dashboard/units");
-    //     }
-    //   }
-    // }
-
-    setLoading(false);
-  }
-
-  function handleReferralCodeChange(details: PinInputValueChangeDetails) {
-    setTeacherPin(details.value.map((item) => item.toUpperCase()));
-    setTeacherPinError(null);
-  }
-
-  function handleReferralCodeComplete(details: PinInputValueChangeDetails) {
-    // Verify the pin without consuming it
-    console.log("verifying...", details.value.join(""));
-    supabase
-      .from("SIGNUP_CODE")
+    // Check for existing account
+    const { data, error } = await supabase
+      .from("USER")
       .select()
-      .eq("VALUE", details.value.join(""))
-      .then(async ({ data, error }) => {
-        console.log(data, error);
-        if (error !== null || data.length !== 1) {
-          setTeacherPinError("Invalid teacher code");
-          console.log("invalid");
-          setValidTeacherPin(false);
-        } else {
-          console.log("valid");
-          setValidTeacherPin(true);
-          const { error } = await supabase.auth.signInWithOtp({ email });
+      .eq("EMAIL", email);
 
-          if (error !== null) {
-            setEmailError("Something went wrong. Try a different email?");
-          } else {
-            setOtpSent(true);
-          }
-          // submitRef.current.focus();
-        }
-      });
+    if (error) console.error(error);
+    showSignup(!error && !data.length);
+  }
+
+  function checkStrength(password: string) {
+    // 0 -> less than 8 characters
+    // 1 -> 8+ characters, one of (upper, lower, numbers, special)
+    // 2 -> 8+ characters, two of (upper, lower, numbers, special)
+    // 3 -> 8+ characters, three of (upper, lower, numbers, special)
+    // 4 -> 8+ characters, all of (upper, lower, numbers, special)
+    // 5 -> 16+ characters
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+    const checks = [hasUpper, hasLower, hasNumber, hasSpecial];
+    const checksCount = checks.filter((item) => item).length;
+
+    if (password.length < 8) {
+      return 0;
+    } else if (password.length < 16) {
+      return checksCount;
+    } else {
+      return 5;
+    }
+  }
+
+  function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
+    setPassword(event.target.value);
+    if (passwordError) setPasswordError("");
+    setStrength(checkStrength(event.target.value));
+  }
+
+  function handlePasswordComplete(event: ChangeEvent<HTMLInputElement>) {
+    const valid = password.length > 7;
+    setPasswordError(valid ? "" : "Enter at least 8 characters");
+    if (!valid) passwordRef.current.focus();
+  }
+
+  function handlePasswordConfirmChange(event: ChangeEvent<HTMLInputElement>) {
+    setPasswordConfirm(event.target.value);
+    if (passwordConfirmError) setPasswordConfirmError("");
+  }
+
+  function handlePasswordConfirmComplete(event: ChangeEvent<HTMLInputElement>) {
+    const valid = passwordConfirm === password;
+    setPasswordConfirmError(valid ? "" : "Passwords must match");
+    if (!valid) passwordConfirmRef.current.focus();
   }
 
   return (
     <DialogRoot
+      placement="center"
       open={open}
       onOpenChange={handleOpenChange}
-      placement="center"
-      initialFocusEl={getEmailRef}
+      initialFocusEl={() => emailRef.current}
     >
       <DialogBackdrop />
       <DialogTrigger asChild>
@@ -314,92 +158,61 @@ export default function Login() {
       </DialogTrigger>
       <DialogContent colorPalette="teal">
         <DialogCloseTrigger />
-        <form onSubmit={handleSubmit} ref={formRef}>
-          <DialogHeader>
-            <VStack gap={2} align="flex-start">
-              <DialogTitle>Log In</DialogTitle>
-              <Text>
-                An account will be created if you don't already have one.
-              </Text>
-            </VStack>
-          </DialogHeader>
-          <DialogBody>
-            <VStack gap={8}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <VStack gap={6}>
+            <Field
+              label="Email"
+              invalid={!!emailError}
+              errorText={emailError}
+              helperText={emailHelp}
+            >
+              <Input
+                placeholder="Enter your email"
+                ref={emailRef}
+                value={email}
+                onChange={handleEmailChange}
+                onBlur={handleEmailComplete}
+              />
+            </Field>
+            <Field
+              label="Password"
+              invalid={!!passwordError}
+              errorText={passwordError}
+            >
+              <PasswordInput
+                placeholder={passwordPlaceholder}
+                ref={passwordRef}
+                value={password}
+                onChange={handlePasswordChange}
+                onBlur={handlePasswordComplete}
+              />
+            </Field>
+            {showStrength && (
+              <PasswordStrengthMeter max={5} value={strength} w="full" />
+            )}
+            {showPasswordConfirm && (
               <Field
-                label="Email"
-                helperText="A login code will be sent to this email"
-                invalid={emailError !== null}
-                errorText={emailError}
+                label="Confirm Password"
+                invalid={!!passwordConfirmError}
+                errorText={passwordConfirmError}
               >
-                <Input
-                  ref={emailRef}
-                  placeholder="me@example.com"
-                  value={email}
-                  onChange={handleEmailChange}
+                <PasswordInput
+                  placeholder="Re-enter the password"
+                  ref={passwordConfirmRef}
+                  value={passwordConfirm}
+                  onChange={handlePasswordConfirmChange}
+                  onBlur={handlePasswordConfirmComplete}
                 />
               </Field>
-              {signup && (
-                <SelectRoot
-                  collection={accountTypes}
-                  value={account}
-                  onValueChange={handleAccountChange}
-                >
-                  <SelectLabel>Account Type</SelectLabel>
-                  <SelectTrigger>
-                    <SelectValueText placeholder="Account Type" />
-                  </SelectTrigger>
-                  <SelectContent zIndex="popover">
-                    {accountTypes.items.map((item) => (
-                      <SelectItem item={item} key={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectRoot>
-              )}
-              {signup && account[0] === "teacher" && (
-                <Field
-                  label="Referral Code"
-                  helperText="Enter your referral code"
-                  invalid={referralCodeError !== null}
-                  errorText={referralCodeError}
-                >
-                  <PinInput
-                    count={6}
-                    type="alphanumeric"
-                    pattern="[A-Za-z0-9]"
-                    value={teacherPin}
-                    onValueComplete={handleReferralCodeComplete}
-                    onValueChange={handleReferralCodeChange}
-                  />
-                </Field>
-              )}
-              {otpSent && (
-                <Field
-                  label="Passcode"
-                  helperText="Enter the code sent to your email"
-                  invalid={otpError !== null}
-                  errorText={otpError}
-                >
-                  <PinInput
-                    onValueComplete={handleOtpComplete}
-                    autoFocus
-                    count={6}
-                    otp
-                    ref={otpRef}
-                    value={otp}
-                    onValueChange={handleOtpChange}
-                  />
-                </Field>
-              )}
-            </VStack>
-          </DialogBody>
-          <DialogFooter>
-            <Button ref={submitRef} loading={loading} type="submit">
-              Log In
-            </Button>
-          </DialogFooter>
-        </form>
+            )}
+          </VStack>
+        </DialogBody>
+        <DialogFooter>
+          <Button>Log In</Button>
+        </DialogFooter>
       </DialogContent>
     </DialogRoot>
   );
