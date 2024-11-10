@@ -17,9 +17,18 @@ import {
   PasswordStrengthMeter,
 } from "@/components/ui/password-input";
 import { PinInput } from "@/components/ui/pin-input";
+import {
+  SelectContent,
+  SelectItem,
+  SelectRoot,
+  SelectTrigger,
+  SelectValueText,
+} from "@/components/ui/select";
 import { toaster } from "@/components/ui/toaster";
 import supabase from "@/supabase/config";
 import {
+  createListCollection,
+  Flex,
   HStack,
   Input,
   PinInputValueChangeDetails,
@@ -29,6 +38,13 @@ import {
 import { validate } from "email-validator";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useContext, useRef, useState } from "react";
+
+const accounts = createListCollection({
+  items: [
+    { label: "Student", value: "student" },
+    { label: "Teacher", value: "teacher" },
+  ],
+});
 
 export default function Login() {
   const [open, setOpen] = useState(false);
@@ -49,6 +65,9 @@ export default function Login() {
   const otpRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const setIsLoading = useContext(LoadingContext);
+  const [account, setAccount] = useState(["student"]);
+  const [referral, setReferral] = useState(["", "", "", "", "", ""]);
+  const [referralError, setReferralError] = useState("");
 
   function handleOpenChange(isOpen: boolean) {
     setOpen(isOpen);
@@ -64,6 +83,9 @@ export default function Login() {
       setOtp(["", "", "", "", "", ""]);
       setOtpSent(false);
       setOtpError("");
+      setAccount([]);
+      setReferral(["", "", "", "", "", ""]);
+      setReferralError("");
     } else {
       setSignup(false);
     }
@@ -71,6 +93,8 @@ export default function Login() {
 
   function handleChangeSignup(isSignup: boolean) {
     setSignup(isSignup);
+    setEmailError("");
+    setPasswordError("");
     emailRef.current.focus();
   }
 
@@ -158,6 +182,50 @@ export default function Login() {
     return valid;
   }
 
+  function validateReferral() {
+    const valid = account[0] === "student";
+    setReferralError(valid ? "" : "Enter the referral code");
+    return valid;
+  }
+
+  function handleReferralChange(details: PinInputValueChangeDetails) {
+    setReferral(details.value);
+    if (referralError) setReferralError("");
+  }
+
+  async function handleReferralComplete(details: PinInputValueChangeDetails) {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("REFERRAL_CODE")
+      .delete()
+      .eq("VALUE", details.valueAsString)
+      .select();
+
+    if (error || data.length !== 1) {
+      setReferralError("Invalid referral code");
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        toaster.error({ title: "Signup Failed", duration: 5000 });
+      } else {
+        setOtpSent(true);
+
+        const { error } = await supabase.from("USER").insert({
+          ID: data.user.id,
+          EMAIL: email,
+          USERNAME: email.split("@")[0],
+          PRIVILEGE: "teacher",
+        });
+
+        if (error) toaster.error({ title: "Signup Failed", duration: 5000 });
+      }
+    }
+
+    setLoading(false);
+  }
+
   function handleOtpChange(details: PinInputValueChangeDetails) {
     setOtp(details.value);
     if (otpError) setOtpError("");
@@ -201,11 +269,12 @@ export default function Login() {
     event.preventDefault();
     setLoading(true);
 
-    if (signup) {
+    if (signup && !otpSent) {
       if (
         !validateEmail() ||
         !validatePassword() ||
         !validatePasswordConfirm() ||
+        !validateReferral() ||
         (await checkExisting())
       ) {
         setLoading(false);
@@ -228,7 +297,7 @@ export default function Login() {
 
         if (error) toaster.error({ title: "Signup Failed", duration: 5000 });
       }
-    } else {
+    } else if (!signup) {
       if (!validateEmail() || !validatePassword() || !(await checkExisting())) {
         setLoading(false);
         return;
@@ -246,6 +315,8 @@ export default function Login() {
         router.push("/dashboard/units");
         handleOpenChange(false);
       }
+    } else {
+      await handleResendOtp();
     }
 
     setLoading(false);
@@ -312,6 +383,48 @@ export default function Login() {
                       onChange={handlePasswordConfirmChange}
                     />
                   </Field>
+                  <Flex
+                    direction="row-reverse"
+                    justify="space-between"
+                    align="flex-start"
+                    w="full"
+                  >
+                    <SelectRoot
+                      collection={accounts}
+                      size="md"
+                      w={32}
+                      variant="subtle"
+                      value={account}
+                      onValueChange={(details) => setAccount(details.value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValueText placeholder="Account" />
+                      </SelectTrigger>
+                      <SelectContent zIndex="popover">
+                        {accounts.items.map((item) => (
+                          <SelectItem item={item} key={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </SelectRoot>
+                    {account[0] === "teacher" && (
+                      <Field
+                        label="Teacher Referral Code"
+                        w="fit"
+                        invalid={!!referralError}
+                        errorText={referralError}
+                      >
+                        <PinInput
+                          otp
+                          count={6}
+                          value={referral}
+                          onValueChange={handleReferralChange}
+                          onValueComplete={handleReferralComplete}
+                        />
+                      </Field>
+                    )}
+                  </Flex>
                 </>
               )}
               {otpSent && (

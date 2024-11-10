@@ -1,11 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ClipboardIconButton, ClipboardInput, ClipboardLabel, ClipboardRoot } from "@/components/ui/clipboard";
-import { DataListItem, DataListRoot } from "@/components/ui/data-list";
-import { Field } from "@/components/ui/field";
-import { InputGroup } from "@/components/ui/input-group";
-import { PinInput } from "@/components/ui/pin-input";
+import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
+import { DataListRoot } from "@/components/ui/data-list";
 import { toaster } from "@/components/ui/toaster";
 import supabase from "@/supabase/config";
 import { Tables } from "@/supabase/supabase";
@@ -39,7 +36,7 @@ export default function Codes() {
 
   function handleGenerateCode() {
     const newCode = ["", "", "", "", "", ""];
-    return newCode.map(_ => String(Math.floor(Math.random() * 10)));
+    return newCode.map((_) => String(Math.floor(Math.random() * 10)));
   }
 
   function handleCreateCode() {
@@ -113,35 +110,38 @@ export default function Codes() {
       <Flex direction="row" justify="flex-start" align="center" w="full">
         <Heading>Referral Codes</Heading>
       </Flex>
-      <Field
-        label="Create Code"
-        helperText="Enter a new referral code"
+      <Flex
+        direction="row"
+        justify="flex-start"
+        align="center"
+        gap={4}
+        w="full"
       >
-        <Flex direction="row" justify="flex-start" align="center" gap={4}>
-          <Button colorPalette="teal" onClick={handleCreateCode}>
-            Generate
-          </Button>
-          {showCode && (
-            <>
-              {showCode && (
-                <ClipboardRoot value={code.join("")}>
-                  <HStack>
-                    <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>{code}</Text>
-                    <ClipboardIconButton size="md" />
-                    <IconButton
-                      aria-label="Clear code"
-                      variant="subtle"
-                      onClick={handleClearCode}
-                    >
-                      <LuX />
-                    </IconButton>
-                  </HStack>
-                </ClipboardRoot>
-              )}
-            </>
-          )}
-        </Flex>
-      </Field>
+        <Button colorPalette="teal" onClick={handleCreateCode}>
+          Generate
+        </Button>
+        {showCode && (
+          <>
+            {showCode && (
+              <ClipboardRoot value={code.join("")}>
+                <HStack>
+                  <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>
+                    {code}
+                  </Text>
+                  <ClipboardIconButton size="md" />
+                  <IconButton
+                    aria-label="Clear code"
+                    variant="subtle"
+                    onClick={handleClearCode}
+                  >
+                    <LuX />
+                  </IconButton>
+                </HStack>
+              </ClipboardRoot>
+            )}
+          </>
+        )}
+      </Flex>
       <Flex
         direction="column"
         justify="flex-start"
@@ -155,7 +155,9 @@ export default function Codes() {
             {codes.map((item, index) => (
               <ClipboardRoot key={item.VALUE} value={item.VALUE}>
                 <HStack>
-                  <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>{item.VALUE}</Text>
+                  <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>
+                    {item.VALUE}
+                  </Text>
                   <ClipboardIconButton size="md" />
                   <IconButton
                     aria-label="Delete code"
