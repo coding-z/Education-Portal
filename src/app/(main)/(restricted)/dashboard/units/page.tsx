@@ -4,6 +4,7 @@ import { Card, Flex, Heading, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import supabase from "../../../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
@@ -36,8 +37,9 @@ export default function Page() {
       py={8}
       gap={8}
     >
-      <Flex direction="row" justify="flex-start" align="center" w="full">
+      <Flex direction="row" justify="space-between" align="center" w="full">
         <Heading>Units</Heading>
+        <Button colorPalette="teal">Create Unit</Button>
       </Flex>
       <Flex
         direction="row"
