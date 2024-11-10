@@ -1,6 +1,5 @@
 "use client";
 
-import Menu from "@/components/menu";
 import { Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import supabase from "../../../../supabase/config";
