@@ -1,3 +1,4 @@
+import LoadingContext from "@/app/loading-context";
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
@@ -26,7 +27,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { validate } from "email-validator";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, useContext, useRef, useState } from "react";
 
 export default function Login() {
   const [open, setOpen] = useState(false);
@@ -45,6 +47,8 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpError, setOtpError] = useState("");
   const otpRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const setIsLoading = useContext(LoadingContext);
 
   function handleOpenChange(isOpen: boolean) {
     setOpen(isOpen);
@@ -172,6 +176,7 @@ export default function Login() {
       // TODO: Refocus on first input
     } else {
       toaster.success({ title: "Signup Succeeded", duration: 5000 });
+      router.push("/dashboard/units");
       handleOpenChange(false);
     }
 
@@ -238,6 +243,7 @@ export default function Login() {
         toaster.error({ title: "Login Failed", duration: 5000 });
       } else {
         toaster.success({ title: "Login Succeeded", duration: 5000 });
+        router.push("/dashboard/units");
         handleOpenChange(false);
       }
     }
@@ -254,7 +260,7 @@ export default function Login() {
     >
       <DialogBackdrop />
       <DialogTrigger asChild>
-        <Button variant="ghost" color="teal.600">
+        <Button variant="ghost" colorPalette="teal">
           Log In
         </Button>
       </DialogTrigger>
