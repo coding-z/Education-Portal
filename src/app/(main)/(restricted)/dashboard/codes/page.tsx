@@ -1,8 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ClipboardIconButton, ClipboardInput, ClipboardLabel, ClipboardRoot } from "@/components/ui/clipboard";
 import { DataListItem, DataListRoot } from "@/components/ui/data-list";
 import { Field } from "@/components/ui/field";
+import { InputGroup } from "@/components/ui/input-group";
 import { PinInput } from "@/components/ui/pin-input";
 import { toaster } from "@/components/ui/toaster";
 import supabase from "@/supabase/config";
@@ -10,6 +12,7 @@ import { Tables } from "@/supabase/supabase";
 import {
   Flex,
   Heading,
+  HStack,
   IconButton,
   PinInputValueChangeDetails,
   Text,
@@ -21,8 +24,9 @@ import { LuX } from "react-icons/lu";
  * A management panel for codes generated to create privileged accounts.
  */
 export default function Codes() {
+  const [showCode, setShowCode] = useState(false);
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [codes, setCodes] = useState<Tables<"SIGNUP_CODE">[]>([]);
+  const [codes, setCodes] = useState<Tables<"REFERRAL_CODE">[]>([]);
 
   function handleCodeChange(details: PinInputValueChangeDetails) {
     setCode(details.value.map((item) => item.toUpperCase()));
@@ -30,12 +34,21 @@ export default function Codes() {
 
   function handleClearCode() {
     setCode(["", "", "", "", "", ""]);
+    setShowCode(false);
+  }
+
+  function handleGenerateCode() {
+    const newCode = ["", "", "", "", "", ""];
+    return newCode.map(_ => String(Math.floor(Math.random() * 10)));
   }
 
   function handleCreateCode() {
+    const newCode = handleGenerateCode();
+    console.log(newCode);
+
     supabase
-      .from("SIGNUP_CODE")
-      .insert({ VALUE: code.join("") })
+      .from("REFERRAL_CODE")
+      .insert({ VALUE: newCode.join("") })
       .then(({ error }) => {
         if (error !== null) {
           console.error(error);
@@ -45,7 +58,8 @@ export default function Codes() {
           });
         } else {
           fetchCodes();
-          handleClearCode();
+          setCode(newCode);
+          setShowCode(true);
           toaster.success({
             title: "Created Code",
             duration: 5000,
@@ -56,7 +70,7 @@ export default function Codes() {
 
   function fetchCodes() {
     supabase
-      .from("SIGNUP_CODE")
+      .from("REFERRAL_CODE")
       .select()
       .then(({ data, error }) => {
         if (error !== null) {
@@ -72,7 +86,7 @@ export default function Codes() {
   function handleDeleteCode(value: string) {
     console.log("Deleting", value);
     supabase
-      .from("SIGNUP_CODE")
+      .from("REFERRAL_CODE")
       .delete()
       .eq("VALUE", value)
       .then((response) => {
@@ -97,30 +111,35 @@ export default function Codes() {
       gap={8}
     >
       <Flex direction="row" justify="flex-start" align="center" w="full">
-        <Heading>Teacher Signup Codes</Heading>
+        <Heading>Referral Codes</Heading>
       </Flex>
       <Field
         label="Create Code"
-        helperText="Enter a new alphanumeric signup code"
+        helperText="Enter a new referral code"
       >
         <Flex direction="row" justify="flex-start" align="center" gap={4}>
-          <PinInput
-            count={6}
-            type="alphanumeric"
-            value={code}
-            pattern="[A-Za-z0-9]"
-            onValueChange={handleCodeChange}
-          />
-          <IconButton
-            aria-label="Clear code"
-            variant="subtle"
-            onClick={handleClearCode}
-          >
-            <LuX />
-          </IconButton>
           <Button colorPalette="teal" onClick={handleCreateCode}>
-            Create
+            Generate
           </Button>
+          {showCode && (
+            <>
+              {showCode && (
+                <ClipboardRoot value={code.join("")}>
+                  <HStack>
+                    <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>{code}</Text>
+                    <ClipboardIconButton size="md" />
+                    <IconButton
+                      aria-label="Clear code"
+                      variant="subtle"
+                      onClick={handleClearCode}
+                    >
+                      <LuX />
+                    </IconButton>
+                  </HStack>
+                </ClipboardRoot>
+              )}
+            </>
+          )}
         </Flex>
       </Field>
       <Flex
@@ -134,17 +153,19 @@ export default function Codes() {
         {codes.length > 0 ? (
           <DataListRoot orientation="horizontal" divideY="1px">
             {codes.map((item, index) => (
-              <Flex direction="row" pt={4} gap={8} key={item.VALUE}>
-                <DataListItem label={`Code ${index + 1}`} value={item.VALUE} />
-                <IconButton
-                  aria-label="Delete code"
-                  variant="ghost"
-                  onClick={() => handleDeleteCode(item.VALUE)}
-                  colorPalette="red"
-                >
-                  <LuX />
-                </IconButton>
-              </Flex>
+              <ClipboardRoot key={item.VALUE} value={item.VALUE}>
+                <HStack>
+                  <Text bgColor="gray.100" px={4} py={2} borderRadius={4}>{item.VALUE}</Text>
+                  <ClipboardIconButton size="md" />
+                  <IconButton
+                    aria-label="Delete code"
+                    variant="subtle"
+                    onClick={() => handleDeleteCode(item.VALUE)}
+                  >
+                    <LuX />
+                  </IconButton>
+                </HStack>
+              </ClipboardRoot>
             ))}
           </DataListRoot>
         ) : (

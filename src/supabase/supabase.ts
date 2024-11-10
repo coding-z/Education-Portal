@@ -76,7 +76,7 @@ export type Database = {
         }
         Relationships: []
       }
-      SIGNUP_CODE: {
+      REFERRAL_CODE: {
         Row: {
           VALUE: string
         }
