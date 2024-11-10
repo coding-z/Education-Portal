@@ -161,16 +161,19 @@ export type Database = {
       UNIT: {
         Row: {
           CODE: string
+          DESCRIPTION: string
           ID: string
           NAME: string
         }
         Insert: {
           CODE: string
+          DESCRIPTION?: string
           ID?: string
           NAME: string
         }
         Update: {
           CODE?: string
+          DESCRIPTION?: string
           ID?: string
           NAME?: string
         }
