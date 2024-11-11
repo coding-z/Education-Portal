@@ -5,26 +5,29 @@ import { useEffect, useState } from "react";
 import supabase from "../../../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
 import { Button } from "@/components/ui/button";
+import CreateUnit from "./create-unit";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [units, setUnits] = useState<Tables<"UNIT">[]>([]);
 
-  useEffect(() => {
+  function reload() {
     setLoading(true);
     supabase
       .from("UNIT")
       .select()
       .then(({ data, error }) => {
         setLoading(false);
-
+  
         if (error) {
           console.error(error);
         } else {
           setUnits(data);
         }
       });
-  }, []);
+  }
+
+  useEffect(reload, []);
 
   return (
     <Flex
@@ -39,7 +42,7 @@ export default function Page() {
     >
       <Flex direction="row" justify="space-between" align="center" w="full">
         <Heading>Units</Heading>
-        <Button colorPalette="teal">Create Unit</Button>
+        <CreateUnit reloadUnits={reload} />
       </Flex>
       <Flex
         direction="row"
