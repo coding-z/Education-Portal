@@ -61,11 +61,13 @@ export default function NavigationHeader() {
     <Flex
       justify="center"
       bgColor={{ base: "gray.50", _dark: "gray.800" }}
-      shadow="md"
+      // shadow="md"
+      borderBottomWidth={1}
+      borderColor="gray.300"
       minH={16}
       align="center"
       w="full"
-      zIndex="docked"
+      // zIndex="banner"
     >
       <Flex
         flexGrow={1}

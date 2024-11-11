@@ -6,11 +6,13 @@ export default function DashboardHeader() {
     <Flex
       justify="center"
       bgColor="gray.50"
-      shadow="md"
+      // shadow="md"
+      borderBottomWidth={1}
+      borderColor="gray.300"
       minH={16}
       align="center"
       w="full"
-      zIndex="docked"
+      // zIndex="sticky"
     >
       <Flex
         flexGrow={1}

@@ -5,26 +5,31 @@ import { useEffect, useState } from "react";
 import supabase from "../../../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
 import { Button } from "@/components/ui/button";
+import CreateUnit from "./create-unit";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [units, setUnits] = useState<Tables<"UNIT">[]>([]);
+  const router = useRouter();
 
-  useEffect(() => {
+  function reload() {
     setLoading(true);
     supabase
       .from("UNIT")
       .select()
       .then(({ data, error }) => {
         setLoading(false);
-
+  
         if (error) {
           console.error(error);
         } else {
           setUnits(data);
         }
       });
-  }, []);
+  }
+
+  useEffect(reload, []);
 
   return (
     <Flex
@@ -39,7 +44,7 @@ export default function Page() {
     >
       <Flex direction="row" justify="space-between" align="center" w="full">
         <Heading>Units</Heading>
-        <Button colorPalette="teal">Create Unit</Button>
+        <CreateUnit reloadUnits={reload} />
       </Flex>
       <Flex
         direction="row"
@@ -60,6 +65,8 @@ export default function Page() {
               colorPalette="teal"
               w="sm"
               size="sm"
+              _hover={{ cursor: "pointer", shadow: "xl" }}
+              onClick={() => router.push(`/dashboard/units/${unit.CODE}`)}
             >
               <Card.Body gap={3}>
                 <Card.Title>
