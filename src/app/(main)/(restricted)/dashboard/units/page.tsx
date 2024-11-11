@@ -6,10 +6,12 @@ import supabase from "../../../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
 import { Button } from "@/components/ui/button";
 import CreateUnit from "./create-unit";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
   const [units, setUnits] = useState<Tables<"UNIT">[]>([]);
+  const router = useRouter();
 
   function reload() {
     setLoading(true);
@@ -63,6 +65,8 @@ export default function Page() {
               colorPalette="teal"
               w="sm"
               size="sm"
+              _hover={{ cursor: "pointer", shadow: "xl" }}
+              onClick={() => router.push(`/dashboard/units/${unit.CODE}`)}
             >
               <Card.Body gap={3}>
                 <Card.Title>
