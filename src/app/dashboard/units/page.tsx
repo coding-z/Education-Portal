@@ -2,7 +2,7 @@
 
 import { Card, Flex, Heading, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import supabase from "../../../../../supabase/config";
+import supabase from "../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
 import { Button } from "@/components/ui/button";
 import CreateUnit from "./create-unit";
@@ -20,7 +20,7 @@ export default function Page() {
       .select()
       .then(({ data, error }) => {
         setLoading(false);
-  
+
         if (error) {
           console.error(error);
         } else {

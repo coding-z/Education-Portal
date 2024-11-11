@@ -1,4 +1,5 @@
-import LoadingContext from "@/app/loading-context";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
@@ -64,7 +65,6 @@ export default function Login() {
   const [otpError, setOtpError] = useState("");
   const otpRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const setIsLoading = useContext(LoadingContext);
   const [account, setAccount] = useState(["student"]);
   const [referral, setReferral] = useState(["", "", "", "", "", ""]);
   const [referralError, setReferralError] = useState("");
@@ -331,7 +331,7 @@ export default function Login() {
     >
       <DialogBackdrop />
       <DialogTrigger asChild>
-        <Button variant="ghost" colorPalette="teal">
+        <Button variant="ghost" color="teal.600">
           Log In
         </Button>
       </DialogTrigger>
