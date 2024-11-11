@@ -43,7 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Text>
             <Separator
               orientation="vertical"
-              height={20}
+              height={28}
               size="md"
               borderRadius="full"
               borderColor={{ base: "black", _dark: "white" }}
