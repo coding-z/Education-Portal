@@ -80,8 +80,10 @@ export default function Page({
             <AccordionItemContent>
               {lessons.length
                 ? lessons.map((lesson) => (
-                    <Button key={lesson.name} variant="ghost" size="xs" w="full" onClick={() => handleDownload(lesson.name)}>
-                      {lesson.name}
+                    <Button key={lesson.name} variant="ghost" size="xs" w="full" onClick={() => handleDownload(lesson.name)} colorPalette="teal">
+                      <Flex direction="row" justify="flex-start" w="full">
+                        {lesson.name}
+                      </Flex>
                     </Button>
                   ))
                 : "Loading lessons..."}
