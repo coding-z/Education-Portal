@@ -3,13 +3,15 @@ import React from "react";
 
 export default function BaseBanner({
   children,
+  justify = "space-between"
 }: {
   children: React.ReactNode;
+  justify?: string;
 }) {
   return (
     <Flex
       direction="row"
-      justify="space-between"
+      justify={justify}
       align="center"
       h={16}
       px={4}

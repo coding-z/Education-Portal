@@ -12,21 +12,67 @@ import NextLink from "next/link";
 import React, { useEffect, useState } from "react";
 import supabase from "../../supabase/config";
 import BaseBanner from "../base-banner";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
+import { Avatar } from "@/components/ui/avatar";
+import { User } from "@supabase/supabase-js";
+import { toaster } from "@/components/ui/toaster";
+import { useRouter } from "next/navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  function handleLogout() {
+    supabase.auth.signOut().then(({ error }) => {
+      if (error) {
+        toaster.error({
+          title: "Failed to Sign Out",
+          duration: 5000,
+        });
+      } else {
+        toaster.success({
+          title: "Signed Out",
+          duration: 5000,
+        });
+        router.push("/");
+      }
+    });
+  }
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
-      setLoggedIn(session?.user !== undefined && session?.user !== null);
+      setUser(session?.user ?? null);
     });
   }, []);
 
   return (
     <>
-      {loggedIn ? (
+      {user !== null ? (
         <>
-          <BaseBanner>Hi</BaseBanner>
+          <BaseBanner justify="flex-end">
+            <MenuRoot>
+              <MenuTrigger>
+                <Avatar name={user.email} _hover={{ cursor: "pointer" }} />
+              </MenuTrigger>
+              <MenuContent>
+                <MenuItem value={user.email} closeOnSelect={false}>
+                  {user.email}
+                </MenuItem>
+                <MenuItem
+                  value="logout"
+                  onClick={handleLogout}
+                  _hover={{ cursor: "pointer" }}
+                >
+                  Log Out
+                </MenuItem>
+              </MenuContent>
+            </MenuRoot>
+          </BaseBanner>
           {children}
         </>
       ) : (
