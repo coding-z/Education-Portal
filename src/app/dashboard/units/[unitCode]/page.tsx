@@ -15,10 +15,12 @@ import {
 } from "@/components/ui/file-button";
 import { toaster } from "@/components/ui/toaster";
 import supabase from "@/supabase/config";
+import { Tables } from "@/supabase/supabase";
 import {
   FileUploadFileAcceptDetails,
   Flex,
   Heading,
+  IconButton,
   Separator,
   Text,
   VStack,
@@ -26,6 +28,7 @@ import {
 import { FileObject } from "@supabase/storage-js";
 import React, { useEffect, useState } from "react";
 import { HiUpload } from "react-icons/hi";
+import { LuX } from "react-icons/lu";
 
 export default function Page({
   params,
@@ -37,6 +40,22 @@ export default function Page({
   const [url, setUrl] = useState(null);
   const [title, setTitle] = useState(null);
   const [showItem, setShowItem] = useState(false);
+  const [user, setUser] = useState<Tables<"USER"> | null>(null);
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session === null) {
+        setUser(null);
+      } else {
+        supabase.from("USER").select().eq("ID", session.user.id)
+        .then(({ data, error }) => {
+          if (error === null) {
+            setUser(data[0]);
+          }
+        });
+      }
+    });
+  }, []);
 
   function fetchFiles() {
     params.then(({ unitCode: fetchedUnitCode }) => {
@@ -98,13 +117,14 @@ export default function Page({
       <BaseBanner>
         <Heading ms={2}>{unitCode}</Heading>
         {showItem && (
-          <Button
+          <IconButton
             variant="ghost"
             color="teal.600"
             onClick={() => setShowItem(false)}
           >
-            Close
-          </Button>
+            {/* Close */}
+            <LuX />
+          </IconButton>
         )}
       </BaseBanner>
       <Flex direction="row" justify="flex-start" flexGrow={1} w="full">
@@ -122,37 +142,36 @@ export default function Page({
           <VStack gap={0}>
             {lessons.length ? (
               lessons.map((lesson, index) => (
-                <>
-                  {/* {index > 0 && <Separator />} */}
-                  <Button
-                    key={lesson.name}
-                    variant="ghost"
-                    size="xs"
-                    w="full"
-                    onClick={() => handleDownload(lesson.name)}
-                    color="teal.600"
-                  >
-                    <Flex direction="row" justify="flex-start" w="full">
-                      {lesson.name}
-                    </Flex>
-                  </Button>
-                </>
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="xs"
+                  w="full"
+                  onClick={() => handleDownload(lesson.name)}
+                  color="teal.600"
+                >
+                  <Flex direction="row" justify="flex-start" w="full">
+                    {lesson.name}
+                  </Flex>
+                </Button>
               ))
             ) : (
               <Text>Loading lessons...</Text>
             )}
           </VStack>
-          <FileUploadRoot
-            accept={["application/pdf"]}
-            onFileAccept={handleUpload}
-          >
-            <FileUploadTrigger asChild>
-              <Button alignSelf="stretch" color="teal.600" variant="outline">
-                <HiUpload /> Upload File
-              </Button>
-            </FileUploadTrigger>
-            {/* <FileUploadList /> */}
-          </FileUploadRoot>
+          {user !== null && user.PRIVILEGE === "teacher" && (
+            <FileUploadRoot
+              accept={["application/pdf"]}
+              onFileAccept={handleUpload}
+            >
+              <FileUploadTrigger asChild>
+                <Button alignSelf="stretch" color="teal.600" variant="outline">
+                  <HiUpload /> Upload File
+                </Button>
+              </FileUploadTrigger>
+              {/* <FileUploadList /> */}
+            </FileUploadRoot>
+          )}
         </Flex>
         {showItem && (
           <iframe src={url} title={title} name={title} width="100%"></iframe>
