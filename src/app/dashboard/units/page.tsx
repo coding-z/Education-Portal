@@ -2,7 +2,7 @@
 
 import { Card, Flex, Heading, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import supabase from "../../../../../supabase/config";
+import supabase from "../../../supabase/config";
 import { Tables } from "@/supabase/supabase";
 import { Button } from "@/components/ui/button";
 import CreateUnit from "./create-unit";
@@ -12,6 +12,22 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [units, setUnits] = useState<Tables<"UNIT">[]>([]);
   const router = useRouter();
+  const [user, setUser] = useState<Tables<"USER"> | null>(null);
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session === null) {
+        setUser(null);
+      } else {
+        supabase.from("USER").select().eq("ID", session.user.id)
+        .then(({ data, error }) => {
+          if (error === null) {
+            setUser(data[0]);
+          }
+        })
+      }
+    })
+  }, []);
 
   function reload() {
     setLoading(true);
@@ -20,7 +36,7 @@ export default function Page() {
       .select()
       .then(({ data, error }) => {
         setLoading(false);
-  
+
         if (error) {
           console.error(error);
         } else {
@@ -44,7 +60,7 @@ export default function Page() {
     >
       <Flex direction="row" justify="space-between" align="center" w="full">
         <Heading>Units</Heading>
-        <CreateUnit reloadUnits={reload} />
+        {user !== null && user.PRIVILEGE === "teacher" && (<CreateUnit reloadUnits={reload} />)}
       </Flex>
       <Flex
         direction="row"
