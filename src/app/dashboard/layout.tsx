@@ -7,6 +7,7 @@ import {
   Separator,
   Text,
   VStack,
+  Heading
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { useEffect, useState } from "react";
@@ -22,6 +23,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { User } from "@supabase/supabase-js";
 import { toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import logo from "@/app/icon.svg";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -54,7 +57,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       {user !== null ? (
         <>
-          <BaseBanner justify="flex-end">
+          <BaseBanner>
+            <ChakraLink asChild color="teal.600" p={2}>
+              <NextLink href="/">
+                <HStack>
+                  <Image src={logo} alt="Education portal logo" />
+                  <Heading>Education Portal</Heading>
+                </HStack>
+              </NextLink>
+            </ChakraLink>
+            <HStack>
+              <ChakraLink asChild color="teal.600" p={2}>
+                <NextLink href="/dashboard/units">Units</NextLink>
+              </ChakraLink>
+              <ChakraLink asChild color="teal.600" p={2}>
+                <NextLink href="/dashboard/codes">Codes</NextLink>
+              </ChakraLink>
+            </HStack>
             <MenuRoot>
               <MenuTrigger>
                 <Avatar name={user.email} _hover={{ cursor: "pointer" }} />
